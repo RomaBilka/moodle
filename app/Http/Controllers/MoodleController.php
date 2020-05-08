@@ -20,7 +20,7 @@ class MoodleController extends Controller
 				'courses' => $this->moodle->getCourses()
 			];
 			return view('courses', $data);
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			return view('error', ['message'=>$e->getMessage()] );
 		}
     }
@@ -32,7 +32,7 @@ class MoodleController extends Controller
 				'users' => $this->moodle->getUsers()
 			];
 			return view('users', $data);
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			return view('error', ['message'=>$e->getMessage()] );
 		}
     }
@@ -44,7 +44,7 @@ class MoodleController extends Controller
 				'user_courses' => $this->moodle->getUserCourses()
 			];
 			return view('user_courses', $data);
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			return view('error', ['message'=>$e->getMessage()] );
 		}
     }
