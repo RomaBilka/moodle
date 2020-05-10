@@ -9,7 +9,7 @@ class local_test_external extends external_api {
      */
     public static function courses_parameters() {
         return new external_function_parameters(                                                                                    
-            array(                                                                                                                  
+            array(
                 'visible' => new external_value(PARAM_INT, 'visible',  VALUE_DEFAULT, 1),
                 'limit' => new external_value(PARAM_INT, 'limit',  VALUE_DEFAULT, 20),
             )
@@ -28,7 +28,7 @@ class local_test_external extends external_api {
         if (!has_capability('moodle/course:view', $context)) {
             throw new moodle_exception('nopermissions');
         }
-		return $tes = $DB->get_records('course',['visible'=>$params['visible']], '', '*', $limitfrom=0, $limitnum=$params['limit']);
+		return $DB->get_records('course',['visible'=>$params['visible']], '', '*', $limitfrom=0, $limitnum=$params['limit']);
     }
 
     /**
@@ -53,7 +53,7 @@ class local_test_external extends external_api {
      */
     public static function users_parameters() {
         return new external_function_parameters(
-            array(                                                                                                                  
+            array(
                 'suspended' => new external_value(PARAM_INT, 'suspended',  VALUE_DEFAULT, 0),
                 'limit' => new external_value(PARAM_INT, 'limit',  VALUE_DEFAULT, 20),
             )
@@ -76,7 +76,7 @@ class local_test_external extends external_api {
             throw new moodle_exception('nopermissions');
         }
 		
-		return $tes = $DB->get_records('user',['suspended'=>$params['suspended']], '', '*', $limitfrom=0, $limitnum=$params['limit']);
+		return $DB->get_records('user',['suspended'=>$params['suspended']], '', '*', $limitfrom=0, $limitnum=$params['limit']);
     }
 
     /**
@@ -105,7 +105,7 @@ class local_test_external extends external_api {
      */
     public static function user_courses_parameters() {
         return new external_function_parameters(
-            array(                                                                                                                  
+            array(
                 'suspended' => new external_value(PARAM_INT, 'suspended',  VALUE_DEFAULT, 0),
                 'limit' => new external_value(PARAM_INT, 'limit',  VALUE_DEFAULT, 20),
             )
