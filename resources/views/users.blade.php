@@ -36,6 +36,9 @@
 					@else
 						No users
                     @endif
+					
+					@include('layouts.users_form');
+					
                 </div>
             </div>
         </div>

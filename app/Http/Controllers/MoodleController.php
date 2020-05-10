@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\MoodleApiService;
+use App\Http\Requests\{StoreUsers, StoreCourses};
 class MoodleController extends Controller
 {
     private $moodle;
@@ -13,11 +14,13 @@ class MoodleController extends Controller
     }
 
 
-    public function getCourses()
+    public function getCourses(StoreCourses $request)
     {
         try {
+			$validated = $request->validated();
+			$this->moodle->setParams($validated );
 			$data=[
-				'courses' => $this->moodle->getCourses()
+				'courses' => $this->moodle->getCourses($validated)
 			];
 			return view('courses', $data);
 		} catch (\Exception $e) {
@@ -25,9 +28,11 @@ class MoodleController extends Controller
 		}
     }
 	
-	public function getUsers()
+	public function getUsers(StoreUsers $request)
     {
         try {
+			$validated = $request->validated();
+			$this->moodle->setParams($validated );
 			$data=[
 				'users' => $this->moodle->getUsers()
 			];
@@ -37,9 +42,11 @@ class MoodleController extends Controller
 		}
     }
 	
-	public function getUserCourses()
+	public function getUserCourses(StoreUsers $request)
     {
         try {
+			$validated = $request->validated();
+			$this->moodle->setParams($validated );
 			$data=[
 				'user_courses' => $this->moodle->getUserCourses()
 			];

@@ -30,6 +30,10 @@
 					@else
 						No courses
                     @endif
+					
+
+					@include('layouts.courses_form');
+
                 </div>
             </div>
         </div>

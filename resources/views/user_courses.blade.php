@@ -67,6 +67,9 @@
 					@else
 						No user courses
                     @endif
+					
+					@include('layouts.users_form');
+					
                 </div>
             </div>
         </div>

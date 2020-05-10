@@ -7,16 +7,19 @@ use Illuminate\Support\Facades\Http;
 class MoodleApiService
 {
     private $base_url = '';
-	private $data = [];
+	private $params = [];
     public function __construct()
     {
         $this->base_url = Config::get('moodle.base_url');
-		$this->data = [
+		$this->params = [
 			'moodlewsrestformat' => 'json',
 			'wstoken' => Config::get('moodle.token')
 		];
     }
-
+	public function setParams(array $params=[]):void
+	{
+		$this->params +=$params;
+	}
     public function getCourses():array
     {
         return $this->sendRequest('local_test_courses');
@@ -33,8 +36,8 @@ class MoodleApiService
 	
     private function sendRequest(string $alias):array
     {
-		$this->data['wsfunction'] = $alias;
-		$response = Http::asForm()->post($this->base_url, $this->data)->json();
+		$this->params['wsfunction'] = $alias;
+		$response = Http::asForm()->post($this->base_url, $this->params)->json();
 		if(isset($response['exception'])){
 			throw new \Exception($response['message']);
 		}else{

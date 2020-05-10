@@ -8,8 +8,11 @@ class local_test_external extends external_api {
      * @return external_function_parameters
      */
     public static function courses_parameters() {
-        return new external_function_parameters(
-                array()
+        return new external_function_parameters(                                                                                    
+            array(                                                                                                                  
+                'visible' => new external_value(PARAM_INT, 'visible',  VALUE_DEFAULT, 1),
+                'limit' => new external_value(PARAM_INT, 'limit',  VALUE_DEFAULT, 20),
+            )
         );
     }
 
@@ -17,14 +20,15 @@ class local_test_external extends external_api {
      * Returns courses
      * @return array courses
      */
-    public static function courses(){
-		global $USER;
+    public static function courses($visible, $limit){
+		global $DB, $USER;
+		$params = self::validate_parameters(self::courses_parameters(), ['visible'=>$visible, 'limit'=>$limit]);
         $context = get_context_instance(CONTEXT_USER, $USER->id);
         self::validate_context($context);
         if (!has_capability('moodle/course:view', $context)) {
             throw new moodle_exception('nopermissions');
         }
-        return get_courses();
+		return $tes = $DB->get_records('course',['visible'=>$params['visible']], '', '*', $limitfrom=0, $limitnum=$params['limit']);
     }
 
     /**
@@ -49,7 +53,10 @@ class local_test_external extends external_api {
      */
     public static function users_parameters() {
         return new external_function_parameters(
-                array()
+            array(                                                                                                                  
+                'suspended' => new external_value(PARAM_INT, 'suspended',  VALUE_DEFAULT, 0),
+                'limit' => new external_value(PARAM_INT, 'limit',  VALUE_DEFAULT, 20),
+            )
         );
     }
 
@@ -57,15 +64,19 @@ class local_test_external extends external_api {
      * Returns users
      * @return array users
      */
-    public static function users() {
+    public static function users($suspended, $limit) {
 		global $DB, $USER;
+
+		$params = self::validate_parameters(self::users_parameters(), ['suspended'=>$suspended, 'limit'=>$limit]);
+		
         $context = get_context_instance(CONTEXT_USER, $USER->id);
         self::validate_context($context);
 
         if (!has_capability('moodle/user:viewdetails', $context)) {
             throw new moodle_exception('nopermissions');
         }
-		return $DB->get_records('user');
+		
+		return $tes = $DB->get_records('user',['suspended'=>$params['suspended']], '', '*', $limitfrom=0, $limitnum=$params['limit']);
     }
 
     /**
@@ -94,7 +105,10 @@ class local_test_external extends external_api {
      */
     public static function user_courses_parameters() {
         return new external_function_parameters(
-                array()
+            array(                                                                                                                  
+                'suspended' => new external_value(PARAM_INT, 'suspended',  VALUE_DEFAULT, 0),
+                'limit' => new external_value(PARAM_INT, 'limit',  VALUE_DEFAULT, 20),
+            )
         );
     }
 
@@ -102,8 +116,11 @@ class local_test_external extends external_api {
      * Returns welcome message
      * @return array user_courses
      */
-    public static function user_courses() {
+    public static function user_courses($suspended, $limit) {
 		global $DB, $USER;
+		
+		$params = self::validate_parameters(self::users_parameters(), ['suspended'=>$suspended, 'limit'=>$limit]);
+		
         $context = get_context_instance(CONTEXT_USER, $USER->id);
         self::validate_context($context);
 
@@ -118,10 +135,12 @@ class local_test_external extends external_api {
 			 LEFT JOIN 	{course} c ON(e.courseid = c.id)
 			 LEFT JOIN 	{grade_items} gi ON(c.id = gi.courseid)
 			 LEFT JOIN 	{grade_grades} gg ON(gi.id = gg.itemid AND gg.userid = u.id)
-			 WHERE c.id > 0 AND gi.itemname IS NOT NULL
-			 ";
-			 
-		$result = $DB->get_recordset_sql($sql);
+				 WHERE  c.id > 0 
+						AND gi.itemname IS NOT NULL 
+						AND u.id IN(SELECT * FROM (SELECT u1.id FROM {user} u1 WHERE u1.suspended = :suspended LIMIT ".(int)$params['limit'].") u2 ) 
+			 ";//LIMIT :limit âèäàº ïîìèëêó
+
+		$result = $DB->get_recordset_sql($sql, ['suspended'=>$params['suspended']]);
 		$users = [];
 		foreach($result as $row){
 			if(empty($users[$row->user_id])){
