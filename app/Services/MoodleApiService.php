@@ -2,55 +2,43 @@
 declare(strict_types=1); 
 namespace App\Services;
 use Illuminate\Support\Facades\Config;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Http;
+
 class MoodleApiService
 {
     private $base_url = '';
-	private $alias = '';
 	private $data = [];
-	
     public function __construct()
     {
-        $this->base_url =  Config::get('moodle.base_url');
+        $this->base_url = Config::get('moodle.base_url');
 		$this->data = [
 			'moodlewsrestformat' => 'json',
 			'wstoken' => Config::get('moodle.token')
 		];
-        $this->client = new Client();
     }
 
     public function getCourses():array
     {
-        $this->alias = 'local_test_courses';
-        return $this->sendRequest();
+        return $this->sendRequest('local_test_courses');
     }
 
     public function getUsers():array
     {
-        $this->alias = 'local_test_users';
-        return $this->sendRequest();
+        return $this->sendRequest('local_test_users');
     }
     public function getUserCourses():array
     {
-        $this->alias = 'local_test_user_courses';
-        return $this->sendRequest();
+        return $this->sendRequest('local_test_user_courses');
     }
 	
-    private function sendRequest():array
+    private function sendRequest(string $alias):array
     {
-		$this->data['wsfunction'] = $this->alias;
-		$result = $this->client->request('POST', $this->base_url, [
-						'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-						'form_params' => $this->data,
-						'verify' => false,
-					]
-				);
-		$data = json_decode($result->getBody()->getContents(), true);
-		if(isset($data['exception'])){
-			throw new \Exception($data['message']);
+		$this->data['wsfunction'] = $alias;
+		$response = Http::asForm()->post($this->base_url, $this->data)->json();
+		if(isset($response['exception'])){
+			throw new \Exception($response['message']);
 		}else{
-			return $data;
+			return $response;
 		}
     }
 

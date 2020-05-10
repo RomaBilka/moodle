@@ -18,6 +18,12 @@ class local_test_external extends external_api {
      * @return array courses
      */
     public static function courses(){
+		global $USER;
+        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        self::validate_context($context);
+        if (!has_capability('moodle/course:view', $context)) {
+            throw new moodle_exception('nopermissions');
+        }
         return get_courses();
     }
 
@@ -52,7 +58,13 @@ class local_test_external extends external_api {
      * @return array users
      */
     public static function users() {
-		global $DB;
+		global $DB, $USER;
+        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        self::validate_context($context);
+
+        if (!has_capability('moodle/user:viewdetails', $context)) {
+            throw new moodle_exception('nopermissions');
+        }
 		return $DB->get_records('user');
     }
 
@@ -91,16 +103,24 @@ class local_test_external extends external_api {
      * @return array user_courses
      */
     public static function user_courses() {
-		global $DB;
-		$sql = "SELECT 	u.id AS user_id, c.id AS course_id, c.fullname AS course_name, CONCAT(u.lastname, ' ', u.firstname) AS user_name, ag.grade AS grade, ag.userid AS ag_user_id, a.name AS item_name, a.id AS item_id
-				  FROM 	`user` AS u
-			 LEFT JOIN 	`user_enrolments` AS ue ON(u.id = ue.userid)
-			 LEFT JOIN 	`enrol` AS e ON(ue.enrolid = e.id)
-			 LEFT JOIN 	`course` AS c ON(e.courseid = c.id)
-			 LEFT JOIN 	`assign` AS a ON(c.id = a.course)
-			 LEFT JOIN 	`assign_grades` AS ag ON(a.id = ag.assignment AND u.id = ag.userid)
-			 WHERE c.id > 0
+		global $DB, $USER;
+        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        self::validate_context($context);
+
+        if (!has_capability('moodle/user:viewdetails', $context)) {
+            throw new moodle_exception('nopermissions');
+        }
+			 
+		$sql = "SELECT DISTINCT u.id AS user_id, c.id AS course_id, c.fullname AS course_name, CONCAT(u.lastname, ' ', u.firstname) AS user_name, gg.finalgrade AS grade, gg.userid AS ag_user_id, gi.itemname AS item_name, gi.id AS item_id
+				  FROM 	{user} u
+			 LEFT JOIN 	{user_enrolments} ue ON(u.id = ue.userid)
+			 LEFT JOIN 	{enrol} e ON(ue.enrolid = e.id)
+			 LEFT JOIN 	{course} c ON(e.courseid = c.id)
+			 LEFT JOIN 	{grade_items} gi ON(c.id = gi.courseid)
+			 LEFT JOIN 	{grade_grades} gg ON(gi.id = gg.itemid AND gg.userid = u.id)
+			 WHERE c.id > 0 AND gi.itemname IS NOT NULL
 			 ";
+			 
 		$result = $DB->get_recordset_sql($sql);
 		$users = [];
 		foreach($result as $row){
