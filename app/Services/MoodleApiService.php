@@ -18,7 +18,7 @@ class MoodleApiService
     }
 	public function setParams(array $params=[]):void
 	{
-		$this->params +=$params;
+		$this->params = $params + $this->params;
 	}
     public function getCourses():array
     {
