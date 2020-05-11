@@ -31,7 +31,7 @@
 										</tr>
 									  </thead>
 									  <tbody>
-										@foreach($user['course'] as $course)
+										@foreach($user['courses'] as $course)
 											<tr>
 											  <td>{{$course['course_name']}}</td>
 											  <td>
@@ -43,7 +43,7 @@
 													</tr>
 												  </thead>
 												  <tbody>
-													@foreach($course['item'] as $item)
+													@foreach($course['items'] as $item)
 														<tr>
 														  <td>{{$item['item_name']}}</td>
 														  <td>{{$item['grade']}}</td>

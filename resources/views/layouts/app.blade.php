@@ -65,17 +65,28 @@
         </style>
     </head>
     <body>
-        <div class="flex-center position-ref full-height">
- 
-                <div class="top-right links">
-                    <a href="{{ route('courses') }}">Courses</a>
-                    <a href="{{ route('users') }}">Users</a>
-                    <a href="{{ route('user_courses') }}">User Courses</a>
-                </div>
+        <div class="flex-center">
+			<div class="content">
+			
+				<div class="container">
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2">
+							<div class="panel panel-default">
+								<div class="panel-heading">Moodle</div>
+								<div class="panel-body">
+									<div class="links">
+										<a href="{{ route('courses') }}">Courses</a>
+										<a href="{{ route('users') }}">Users</a>
+										<a href="{{ route('user_courses') }}">User Courses</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-            <div class="content">
-				@yield('content')
-				
+				 @yield('content')
+
 				@if($errors->any())
 					<div class="alert alert-danger">
 						<ul>
